@@ -1,0 +1,15 @@
+{
+  "name": "masaka",
+  "private": true,
+  "packageManager": "bun@1.3.10",
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@masaka/element": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@masaka/core",
+  "version": "0.0.0",
+  "type": "module",
+  "module": "./index.ts",
+  "dependencies": {
+    "@masaka/element": "workspace:*",
+    "cordis": "^4.0.0-rc.0"
+  }
+}
