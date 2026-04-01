@@ -1,11 +1,13 @@
 import { h } from "@masaka/element"
 
-console.log(h.raw`\
-# Hello, ${<mention everyone />}!
-${<img src="https://masaka.dev/avatar.png" />}\
-`)
+const satori = <a href="https://satori.chat/">Satori</a>
+const koishi = <a href="https://koishi.chat/">Koishi</a>
 
 console.log(h.markdown`
 # Hello, ${<mention everyone />}!
-${<img src="https://masaka.dev/avatar.png" width={480} />}
+${<img src="https://masaka.dev/avatar.png" />}
+
+- I'm the \`masaka\` protocol,
+- created by ${<mention user="montmorill" />},
+- inspired by ${satori} & ${koishi}.
 `)

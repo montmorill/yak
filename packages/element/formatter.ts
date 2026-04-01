@@ -17,6 +17,7 @@ interface FormatterOptions {
   indent?: string,
   inline?: boolean,
   color?: boolean,
+  compact?: boolean
 }
 
 export class Formatter {
@@ -25,6 +26,7 @@ export class Formatter {
   readonly indent: string
   readonly inline: boolean
   readonly color: boolean
+  readonly compact: boolean
   private needLine = false
 
   constructor({
@@ -33,12 +35,14 @@ export class Formatter {
     indent = "  ",
     inline = false,
     color = true,
+    compact = true,
   }: FormatterOptions) {
     this.print = print
     this.depth = depth
     this.indent = indent
     this.inline = inline
     this.color = color
+    this.compact = compact
   }
 
   nest() {
@@ -87,8 +91,13 @@ export class Formatter {
       this.print(" />")
     } else {
       this.print(">")
-      this.children(element.children)
-      this.newLine()
+      if (element.children.length === 1
+        && (this.compact || !(element.children[0] instanceof Element)))
+        this.node(element.children[0])
+      else {
+        this.children(element.children)
+        this.newLine()
+      }
       this.print(`</${tag}>`)
     }
     this.needLine = true
