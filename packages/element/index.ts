@@ -1,5 +1,4 @@
-export { createElement as h } from "./jsx-runtime"
-export { markdown } from "./markdown"
+export { h } from "./jsx-runtime"
 import type { XOR } from "ts-xor"
 
 globalThis.Fragment = Fragment

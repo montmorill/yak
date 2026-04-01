@@ -1,5 +1,5 @@
 import { Node, Parser, type NodeType } from "commonmark"
-import { createElement, type ElementNode } from "./jsx-runtime"
+import { h, type ElementNode } from "./jsx-runtime"
 
 const parser = new Parser()
 
@@ -79,30 +79,30 @@ function esacpeSlot(...children: [ElementNode]) {
 }
 
 function pack(children: ElementNode[]) {
-  return children.length === 1 ? children[0] : createElement("Fragment", {}, ...children)
+  return children.length === 1 ? children[0] : h("Fragment", {}, ...children)
 }
 
 const TRANSFORMERS: Record<NodeType, (node: Node) => ElementNode> = {
   text: node => pack(esacpeSlot(node.literal)),
   softbreak: () => " ",
-  linebreak: () => createElement("br"),
-  emph: node => createElement("em", {}, ...transformChildren(node)),
-  strong: node => createElement("strong", {}, ...transformChildren(node)),
+  linebreak: () => h("br"),
+  emph: node => h("em", {}, ...transformChildren(node)),
+  strong: node => h("strong", {}, ...transformChildren(node)),
   html_inline: node => pack(esacpeSlot(node.literal)),
-  link: node => createElement("a", { href: node.destination!, title: node.title || undefined }, ...transformChildren(node)),
-  image: node => createElement("img", { src: node.destination!, title: node.title || undefined }, ...transformChildren(node)),
-  code: node => createElement("code", {}, pack(esacpeSlot(node.literal))),
-  document: node => createElement("Fragment", {}, ...transformChildren(node)),
-  paragraph: node => createElement("p", {}, ...transformChildren(node)),
-  block_quote: node => createElement("blockquote", {}, ...transformChildren(node)),
-  item: node => createElement("li", {}, ...transformChildren(node)),
+  link: node => h("a", { href: node.destination!, title: node.title || undefined }, ...transformChildren(node)),
+  image: node => h("img", { src: node.destination!, title: node.title || undefined }, ...transformChildren(node)),
+  code: node => h("code", {}, pack(esacpeSlot(node.literal))),
+  document: node => h("Fragment", {}, ...transformChildren(node)),
+  paragraph: node => h("p", {}, ...transformChildren(node)),
+  block_quote: node => h("blockquote", {}, ...transformChildren(node)),
+  item: node => h("li", {}, ...transformChildren(node)),
   list: node => node.listType === "ordered"
-    ? createElement("ol", { start: node.listStart, delimiter: node.listDelimiter }, ...transformChildren(node))
-    : createElement("ul", {}, ...transformChildren(node)),
-  heading: node => createElement(`h${node.level}`, {}, ...transformChildren(node)),
-  code_block: node => createElement("codeblock", { lang: node.info }, pack(esacpeSlot(node.literal))),
+    ? h("ol", { start: node.listStart, delimiter: node.listDelimiter }, ...transformChildren(node))
+    : h("ul", {}, ...transformChildren(node)),
+  heading: node => h(`h${node.level}`, {}, ...transformChildren(node)),
+  code_block: node => h("codeblock", { lang: node.info }, pack(esacpeSlot(node.literal))),
   html_block: node => pack(esacpeSlot(node.literal)),
-  thematic_break: () => createElement("hr"),
+  thematic_break: () => h("hr"),
   custom_inline: node => { throw new Error(`Function ${node.type} not implemented.`) },
   custom_block: node => { throw new Error(`Function ${node.type} not implemented.`) },
 }

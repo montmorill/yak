@@ -1,3 +1,5 @@
+import { markdown } from "./markdown"
+
 export type ElementNode = Element | string | number | boolean | null | undefined
 
 export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements> {
@@ -10,7 +12,7 @@ export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.Intrinsic
 
 type IsEmptyObject<T> = T extends {} ? keyof T extends never ? true : false : false
 
-export function createElement<T extends keyof JSX.IntrinsicElements>(
+export function h<T extends keyof JSX.IntrinsicElements>(
   type: T,
   ...[props, ...children]: IsEmptyObject<JSX.IntrinsicElements[T]> extends true
     ? [props?: JSX.IntrinsicElements[T], ...children: ElementNode[]]
@@ -18,6 +20,8 @@ export function createElement<T extends keyof JSX.IntrinsicElements>(
 ): Element<T> {
   return new Element(type, props || {} as JSX.IntrinsicElements[T], children)
 }
+
+h.markdown = markdown
 
 export const Fragment = "Fragment"
 
