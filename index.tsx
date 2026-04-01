@@ -8,4 +8,4 @@ ${<img src="https://masaka.dev/avatar.png" />}
 console.log(h.markdown`
 # Hello, ${<mention everyone />}!
 ${<img src="https://masaka.dev/avatar.png" />}
-`)
+`?.toString())

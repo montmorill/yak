@@ -1,3 +1,4 @@
+import { BufferFormatter, Formatter } from "./formatter"
 import { markdown, raw } from "./markdown"
 
 export type ElementNode = Element | string | number | boolean | null | undefined
@@ -8,6 +9,16 @@ export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.Intrinsic
     readonly props: JSX.IntrinsicElements[T],
     readonly children: ElementNode[]
   ) { }
+
+  toString() {
+    const formatter = new BufferFormatter()
+    formatter.element(this)
+    return formatter.buffer
+  }
+
+  [Symbol.for('nodejs.util.inspect.custom')]() {
+    return this.toString()
+  }
 }
 
 type IsEmptyObject<T> = T extends {} ? keyof T extends never ? true : false : false
