@@ -1,3 +1,4 @@
+import { inspect } from 'node:util'
 import { Element, Fragment } from './jsx-runtime'
 
 const COLORS = {
@@ -96,7 +97,7 @@ export class Formatter {
       this.print('>')
       if (element.children.length === 1
         && (this.compact || !(element.children[0] instanceof Element))) {
-        this.node(element.children[0])
+        this.node(element.children[0]!)
       }
       else {
         const nested = this.nest()
@@ -127,7 +128,10 @@ export class Formatter {
       }
     }
     else {
-      this.print(node)
+      if (this.needLine)
+        this.newLine()
+      this.print(`{${inspect(node, false, this.depth, true)}}`)
+      this.newLine()
     }
   }
 }

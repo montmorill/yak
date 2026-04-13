@@ -7,14 +7,14 @@ declare global {
     }[keyof JSX.IntrinsicElements]>
 
     interface IntrinsicElements {
-      template: Record<never, never>
+      template: object
     }
   }
 }
 
 export const Fragment = 'template'
 
-export type Fragment = Element | string | number | boolean | null | undefined
+export type Fragment = Element | string | any
 
 export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements> {
   constructor(
@@ -39,12 +39,12 @@ type IsNullSafeObject<T> = keyof T extends never ? true : T extends Partial<T> ?
 function h<T extends keyof JSX.IntrinsicElements>(
   type: T,
   ...args: IsNullSafeObject<JSX.IntrinsicElements[T]> extends true
-    ? Fragment[] | [attrs?: JSX.IntrinsicElements[T], ...children: Fragment[]]
+    ? Fragment[] | [attrs: JSX.IntrinsicElements[T], ...children: Fragment[]]
     : [attrs: JSX.IntrinsicElements[T], ...children: Fragment[]]
 ): Element<T> {
   if (args[0] instanceof Element || typeof args[0] !== 'object')
     return new Element(type, {} as JSX.IntrinsicElements[T], args as Fragment[])
-  return new Element(type, args[0] as JSX.IntrinsicElements[T], args.slice(1) as Fragment[])
+  return new Element(type, args[0] ?? {} as JSX.IntrinsicElements[T], args.slice(1) as Fragment[])
 }
 
 export default new Proxy(h, {

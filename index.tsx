@@ -12,3 +12,14 @@ console.log(h.markdown`
 - created by ${<mention user="montmorill" />},
 - inspired by ${satori} & ${koishi}.
 `)
+
+console.log(
+  <>
+    <mention everyone />
+    {new Promise(resolve => setTimeout(resolve, 1000))}
+    <mention everyone />
+    {new Promise(resolve => setTimeout(resolve, 1000))}
+    {new Promise(resolve => setTimeout(resolve, 1000))}
+    Time flies like fast.
+  </>,
+)

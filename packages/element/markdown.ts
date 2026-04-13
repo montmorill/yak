@@ -1,6 +1,5 @@
 import type { Node, NodeType } from 'commonmark'
 import type { Fragment } from './jsx-runtime'
-
 import { Parser } from 'commonmark'
 import h, { Element } from './jsx-runtime'
 
@@ -39,15 +38,15 @@ declare global {
 }
 
 const TRANSFORMERS: Record<NodeType, (node: Node) => Fragment> = {
-  text: node => esacpeSlot(node.literal),
+  text: node => esacpeSlot(node.literal!),
   softbreak: () => ' ',
   linebreak: () => h.br(),
   emph: node => h.em(...transformChildren(node)),
   strong: node => h.strong(...transformChildren(node)),
-  html_inline: node => esacpeSlot(node.literal),
+  html_inline: node => esacpeSlot(node.literal!),
   link: node => h.a({ href: node.destination!, title: node.title ?? undefined }, ...transformChildren(node)),
   image: node => h.img({ src: node.destination!, title: node.title ?? undefined }, ...transformChildren(node)),
-  code: node => h.code(esacpeSlot(node.literal)),
+  code: node => h.code(esacpeSlot(node.literal!)),
   document: node => h.template(...transformChildren(node)),
   paragraph: node => h.p(...transformChildren(node)),
   block_quote: node => h.blockquote(...transformChildren(node)),
@@ -56,8 +55,8 @@ const TRANSFORMERS: Record<NodeType, (node: Node) => Fragment> = {
     ? h.ol({ start: node.listStart, delimiter: node.listDelimiter }, ...transformChildren(node))
     : h.ul(...transformChildren(node)),
   heading: node => h(`h${node.level}`, ...transformChildren(node)),
-  code_block: node => h.codeblock({ lang: node.info ?? undefined }, esacpeSlot(node.literal)),
-  html_block: node => esacpeSlot(node.literal),
+  code_block: node => h.codeblock({ lang: node.info ?? undefined }, esacpeSlot(node.literal!)),
+  html_block: node => esacpeSlot(node.literal!),
   thematic_break: () => h.br(),
   custom_inline: node => { throw new Error(`Function ${node.type} not implemented.`) },
   custom_block: node => { throw new Error(`Function ${node.type} not implemented.`) },
@@ -73,7 +72,7 @@ function transformChildren(node: Node) {
     const node = transformNode(child)
     if (node === '<slot>') {
       const index = +(child = child.next!).literal!
-      children.push(slotValues[index])
+      children.push(slotValues[index]!)
       child = child.next!
     }
     else {
@@ -104,7 +103,7 @@ function esacpeSlot(...children: [Fragment]) {
     children.pop()
 
     const before = lastStr.slice(0, match.index)
-    const value = slotValues[+match[1]!]
+    const value = slotValues[+match[1]!]!
     const after = lastStr.slice(match.index! + match[0].length)
 
     if (before) {

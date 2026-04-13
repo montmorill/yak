@@ -1,6 +1,5 @@
 import type { XOR } from 'ts-xor'
 import h, { Fragment } from './jsx-runtime'
-
 import { markdown } from './markdown'
 
 declare global {
