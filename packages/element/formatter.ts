@@ -1,4 +1,4 @@
-import { Element, type ElementNode, Fragment } from "./jsx-runtime"
+import { Element, Fragment } from './jsx-runtime'
 
 const COLORS = {
   black: 30,
@@ -13,10 +13,10 @@ const COLORS = {
 
 interface FormatterOptions {
   print: (data: any) => void
-  depth?: number,
-  indent?: string,
-  inline?: boolean,
-  color?: boolean,
+  depth?: number
+  indent?: string
+  inline?: boolean
+  color?: boolean
   compact?: boolean
 }
 
@@ -32,7 +32,7 @@ export class Formatter {
   constructor({
     print,
     depth = 0,
-    indent = "  ",
+    indent = '  ',
     inline = false,
     color = true,
     compact = true,
@@ -50,52 +50,60 @@ export class Formatter {
   }
 
   newLine() {
-    if (this.inline) return
-    this.print("\n" + this.indent.repeat(this.depth))
+    if (this.inline)
+      return
+    this.print(`\n${this.indent.repeat(this.depth)}`)
     this.needLine = false
   }
 
   colored(color: keyof typeof COLORS, data: any) {
-    return this.color ? `\x1b[${COLORS[color]}m${data}\x1b[0m` : data
+    return this.color ? `\x1B[${COLORS[color]}m${data}\x1B[0m` : data
   }
 
-  props(props: Record<string, unknown>) {
-    for (const [key, value] of Object.entries(props)) {
-      this.print(` ${this.colored("red", key)}`)
-      if (value === true) continue
-      this.print("=")
+  attrs(attrs: Record<string, any>) {
+    for (const [key, value] of Object.entries(attrs)) {
+      this.print(` ${this.colored('red', key)}`)
+      if (value === true)
+        continue
+      this.print('=')
       switch (typeof value) {
-        case "boolean": this.print(`{${this.colored("magenta", value)}}`); break
-        case "number": this.print(`{${this.colored("blue", value)}}`); break
-        case "string": this.print(`"${this.colored("green", value.replaceAll('"', '\\"'))}"`); break
-        default: this.print(`"{${JSON.stringify(value)}}}`); break
+        case 'boolean':
+          this.print(`{${this.colored('magenta', value)}}`)
+          break
+        case 'number':
+          this.print(`{${this.colored('blue', value)}}`)
+          break
+        case 'string':
+          this.print(`"${this.colored('green', value.replaceAll('"', '\\"'))}"`)
+          break
+        default:
+          this.print(`{${JSON.stringify(value)}}`)
+          break
       }
     }
   }
 
-  children(children: ElementNode[]) {
-    const nested = this.nest()
-    nested.newLine()
-    for (const child of children) {
-      nested.node(child)
-    }
-  }
-
   element(element: Element) {
-    const tag = this.colored("green",
-      element.type == Fragment ? "" : element.type)
-    if (this.needLine) this.newLine()
+    const tag = this.colored('green', element.type === Fragment ? '' : element.type)
+    if (this.needLine)
+      this.newLine()
     this.print(`<${tag}`)
-    this.props(element.props)
+    this.attrs(element.attrs)
     if (element.children.length === 0) {
-      this.print(" />")
-    } else {
-      this.print(">")
+      this.print(' />')
+    }
+    else {
+      this.print('>')
       if (element.children.length === 1
-        && (this.compact || !(element.children[0] instanceof Element)))
+        && (this.compact || !(element.children[0] instanceof Element))) {
         this.node(element.children[0])
+      }
       else {
-        this.children(element.children)
+        const nested = this.nest()
+        nested.newLine()
+        for (const child of element.children) {
+          nested.node(child)
+        }
         this.newLine()
       }
       this.print(`</${tag}>`)
@@ -103,12 +111,13 @@ export class Formatter {
     this.needLine = true
   }
 
-  node(node: ElementNode) {
+  node(node: Fragment) {
     if (node instanceof Element) {
       this.element(node)
-    } else if (typeof node === "string") {
+    }
+    else if (typeof node === 'string') {
       this.needLine = false
-      const lines = node.split("\n")
+      const lines = node.split('\n')
       this.print(lines[0])
       if (lines.length > 1) {
         for (const line of lines.slice(1)) {
@@ -116,15 +125,16 @@ export class Formatter {
           this.print(line)
         }
       }
-    } else {
+    }
+    else {
       this.print(node)
     }
   }
 }
 
 export class BufferFormatter extends Formatter {
-  buffer = ""
-  constructor(options?: Omit<FormatterOptions, "print">) {
-    super({ ...options, print: (text) => this.buffer += text })
+  buffer = ''
+  constructor(options?: Omit<FormatterOptions, 'print'>) {
+    super({ ...options, print: text => this.buffer += text })
   }
 }

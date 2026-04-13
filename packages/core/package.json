@@ -1,10 +1,14 @@
 {
-  "name": "@masaka/core",
-  "version": "0.0.0",
+  "name": "@yak/core",
   "type": "module",
+  "version": "0.0.0",
   "module": "./index.ts",
   "dependencies": {
-    "@masaka/element": "workspace:*",
-    "cordis": "^4.0.0-rc.0"
+    "@cordisjs/plugin-http": "^1.2.0",
+    "@yak/element": "workspace:*",
+    "cordis": "3",
+    "cosmokit": "^1.8.1",
+    "typebox": "^1.1.13",
+    "typemap": "^1.1.0"
   }
 }

@@ -1,14 +1,27 @@
-import { BufferFormatter } from "./formatter"
-import { markdown, raw } from "./markdown"
+import { BufferFormatter } from './formatter'
 
-export type ElementNode = Element | string | number | boolean | null | undefined
+declare global {
+  namespace JSX {
+    type Element = InstanceType<{
+      [T in keyof JSX.IntrinsicElements]: typeof Element<T>
+    }[keyof JSX.IntrinsicElements]>
+
+    interface IntrinsicElements {
+      template: Record<never, never>
+    }
+  }
+}
+
+export const Fragment = 'template'
+
+export type Fragment = Element | string | number | boolean | null | undefined
 
 export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements> {
   constructor(
     readonly type: T,
-    readonly props: JSX.IntrinsicElements[T],
-    readonly children: ElementNode[]
-  ) { }
+    readonly attrs: JSX.IntrinsicElements[T],
+    readonly children: Fragment[],
+  ) {}
 
   toString(color = false) {
     const formatter = new BufferFormatter({ color })
@@ -21,34 +34,28 @@ export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.Intrinsic
   }
 }
 
-type IsEmptyObject<T> = T extends {} ? keyof T extends never ? true : false : false
+type IsNullSafeObject<T> = keyof T extends never ? true : T extends Partial<T> ? true : false
 
-export function h<T extends keyof JSX.IntrinsicElements>(
+function h<T extends keyof JSX.IntrinsicElements>(
   type: T,
-  ...[props, ...children]: IsEmptyObject<JSX.IntrinsicElements[T]> extends true
-    ? [props?: JSX.IntrinsicElements[T], ...children: ElementNode[]]
-    : [props: JSX.IntrinsicElements[T], ...children: ElementNode[]]
+  ...args: IsNullSafeObject<JSX.IntrinsicElements[T]> extends true
+    ? Fragment[] | [attrs?: JSX.IntrinsicElements[T], ...children: Fragment[]]
+    : [attrs: JSX.IntrinsicElements[T], ...children: Fragment[]]
 ): Element<T> {
-  return new Element(type, props || {} as JSX.IntrinsicElements[T], children)
+  if (args[0] instanceof Element || typeof args[0] !== 'object')
+    return new Element(type, {} as JSX.IntrinsicElements[T], args as Fragment[])
+  return new Element(type, args[0] as JSX.IntrinsicElements[T], args.slice(1) as Fragment[])
 }
 
-h.raw = raw
-h.markdown = markdown
-
-export const Fragment = "Fragment"
-
-globalThis.Fragment = Fragment
-
-declare global {
-  var Fragment: "Fragment"
-
-  namespace JSX {
-    interface IntrinsicElements {
-      Fragment: {}
+export default new Proxy(h, {
+  get(target, prop, receiver) {
+    if (Object.hasOwn(target, prop)) {
+      return Reflect.get(target, prop, receiver)
     }
-
-    type Element = InstanceType<{
-      [K in keyof JSX.IntrinsicElements]: typeof Element<K>
-    }[keyof JSX.IntrinsicElements]>
-  }
+    return (...args: any[]) => target(prop as keyof JSX.IntrinsicElements, ...args)
+  },
+}) as typeof h & {
+  [T in keyof JSX.IntrinsicElements]:
+  Parameters<typeof h<T>> extends [infer _, ...infer R]
+    ? (...args: R) => Element<T> : never
 }

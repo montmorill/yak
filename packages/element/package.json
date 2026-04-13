@@ -1,13 +1,13 @@
 {
-  "name": "@masaka/element",
-  "version": "0.0.0",
+  "name": "@yak/element",
   "type": "module",
+  "version": "0.0.0",
   "module": "./index.ts",
   "dependencies": {
-    "@types/commonmark": "^0.27.10",
     "commonmark": "^0.31.2"
   },
   "devDependencies": {
+    "@types/commonmark": "^0.27.10",
     "ts-xor": "^1.3.0"
   }
 }

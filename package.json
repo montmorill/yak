@@ -1,15 +1,20 @@
 {
-  "name": "masaka",
+  "name": "yak",
+  "type": "module",
   "private": true,
   "packageManager": "bun@1.3.10",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "adapters/*"
   ],
   "dependencies": {
-    "@masaka/element": "workspace:*"
+    "@yak/adapter-qq": "workspace:*",
+    "@yak/core": "workspace:*",
+    "@yak/element": "workspace:*"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@antfu/eslint-config": "^8.2.0",
+    "@types/node": "^25.5.2",
     "typescript": "^5"
   }
 }
