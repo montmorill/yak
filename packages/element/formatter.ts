@@ -1,3 +1,4 @@
+import type { InspectOptions } from 'node:util'
 import { inspect } from 'node:util'
 import { Element, Fragment } from './jsx-runtime'
 
@@ -12,53 +13,53 @@ const COLORS = {
   white: 37,
 } as const
 
-interface FormatterOptions {
-  print: (data: any) => void
-  depth?: number
+export interface FormatterOptions {
   indent?: string
   inline?: boolean
-  color?: boolean
-  compact?: boolean
 }
 
 export class Formatter {
-  readonly print: (data: any) => void
-  readonly depth: number
-  readonly indent: string
-  readonly inline: boolean
-  readonly color: boolean
-  readonly compact: boolean
   private needLine = false
 
-  constructor({
-    print,
-    depth = 0,
-    indent = '  ',
-    inline = false,
-    color = true,
-    compact = true,
-  }: FormatterOptions) {
-    this.print = print
-    this.depth = depth
-    this.indent = indent
-    this.inline = inline
-    this.color = color
-    this.compact = compact
-  }
+  constructor(
+    readonly print: (data: any) => void,
+    readonly opts: InspectOptions & FormatterOptions,
+  ) { }
 
   nest() {
-    return new Formatter({ ...this, depth: this.depth + 1 })
+    return new Formatter(this.print, {
+      ...this.opts,
+      indent: `${this.opts.indent ?? ''}  `,
+    })
   }
 
   newLine() {
-    if (this.inline)
+    if (this.opts.inline)
       return
-    this.print(`\n${this.indent.repeat(this.depth)}`)
+    this.print(`\n${this.opts.indent ?? ''}`)
     this.needLine = false
   }
 
   colored(color: keyof typeof COLORS, data: any) {
-    return this.color ? `\x1B[${COLORS[color]}m${data}\x1B[0m` : data
+    return this.opts.colors ? `\x1B[${COLORS[color]}m${data}\x1B[0m` : data
+  }
+
+  string(value: string) {
+    this.print(`"${this.colored('green', value.replaceAll('"', '\\"'))}"`)
+  }
+
+  indented(value: string) {
+    this.needLine = false
+    const lines = value.split('\n')
+    this.print(lines[0])
+    for (const line of lines.slice(1)) {
+      this.newLine()
+      this.print(line)
+    }
+  }
+
+  object(object: any) {
+    this.indented(`{${inspect(object, this.opts)}}`)
   }
 
   attrs(attrs: Record<string, any>) {
@@ -67,20 +68,10 @@ export class Formatter {
       if (value === true)
         continue
       this.print('=')
-      switch (typeof value) {
-        case 'boolean':
-          this.print(`{${this.colored('magenta', value)}}`)
-          break
-        case 'number':
-          this.print(`{${this.colored('blue', value)}}`)
-          break
-        case 'string':
-          this.print(`"${this.colored('green', value.replaceAll('"', '\\"'))}"`)
-          break
-        default:
-          this.print(`{${JSON.stringify(value)}}`)
-          break
-      }
+      if (typeof value === 'string')
+        this.string(value)
+      else
+        this.object(value)
     }
   }
 
@@ -96,7 +87,7 @@ export class Formatter {
     else {
       this.print('>')
       if (element.children.length === 1
-        && (this.compact || !(element.children[0] instanceof Element))) {
+        && (this.opts.compact || !(element.children[0] instanceof Element))) {
         this.node(element.children[0]!)
       }
       else {
@@ -117,20 +108,12 @@ export class Formatter {
       this.element(node)
     }
     else if (typeof node === 'string') {
-      this.needLine = false
-      const lines = node.split('\n')
-      this.print(lines[0])
-      if (lines.length > 1) {
-        for (const line of lines.slice(1)) {
-          this.newLine()
-          this.print(line)
-        }
-      }
+      this.indented(node)
     }
     else {
       if (this.needLine)
         this.newLine()
-      this.print(`{${inspect(node, false, this.depth, true)}}`)
+      this.object(node)
       this.newLine()
     }
   }
@@ -138,7 +121,7 @@ export class Formatter {
 
 export class BufferFormatter extends Formatter {
   buffer = ''
-  constructor(options?: Omit<FormatterOptions, 'print'>) {
-    super({ ...options, print: text => this.buffer += text })
+  constructor(opts?: InspectOptions & Omit<FormatterOptions, 'print'>) {
+    super(text => this.buffer += text, opts ?? {})
   }
 }

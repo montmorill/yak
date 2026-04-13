@@ -1,3 +1,6 @@
+import type { InspectOptions } from 'node:util'
+import type { FormatterOptions } from './formatter'
+import util from 'node:util'
 import { BufferFormatter } from './formatter'
 
 declare global {
@@ -23,14 +26,14 @@ export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.Intrinsic
     readonly children: Fragment[],
   ) {}
 
-  toString(color = false) {
-    const formatter = new BufferFormatter({ color })
+  toString(opts?: InspectOptions & Omit<FormatterOptions, 'print'>) {
+    const formatter = new BufferFormatter(opts)
     formatter.element(this)
     return formatter.buffer
   }
 
-  [Symbol.for('nodejs.util.inspect.custom')]() {
-    return this.toString(true)
+  [util.inspect.custom](_depth: number | null | undefined, inspectOptions: InspectOptions) {
+    return this.toString(inspectOptions)
   }
 }
 
