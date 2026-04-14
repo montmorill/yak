@@ -2,13 +2,11 @@
   "name": "@yak/core",
   "type": "module",
   "version": "0.0.0",
-  "module": "./index.ts",
   "dependencies": {
     "@cordisjs/plugin-http": "^1.2.0",
-    "@yak/element": "workspace:*",
-    "cordis": "3",
+    "@yak/protocol": "workspace:*",
+    "cordis": "^3.18.1",
     "cosmokit": "^1.8.1",
-    "typebox": "^1.1.13",
-    "typemap": "^1.1.0"
+    "path-to-regexp": "^8.4.2"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "name": "@yak/protocol",
+  "type": "module",
+  "version": "0.0.0",
+  "dependencies": {
+    "cosmokit": "^1.8.1"
+  }
+}
