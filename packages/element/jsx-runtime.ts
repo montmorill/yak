@@ -17,7 +17,8 @@ declare global {
 
 export const Fragment = 'template'
 
-export type Fragment = Element | string | any
+export type Fragment = Element | object | string | number | bigint
+export type MaybeFragment = Fragment | false | null | undefined
 
 export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements> {
   constructor(
@@ -32,22 +33,31 @@ export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.Intrinsic
     return formatter.buffer
   }
 
-  [util.inspect.custom](_depth: number | null | undefined, inspectOptions: InspectOptions) {
-    return this.toString(inspectOptions)
+  [util.inspect.custom](_depth: number | null | undefined, opts: InspectOptions) {
+    return this.toString(opts)
   }
 }
 
-type IsNullSafeObject<T> = keyof T extends never ? true : T extends Partial<T> ? true : false
+type IsNullSafeObject<T> = keyof T extends never ? true : Partial<T> extends T ? true : false
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object'
+    && Object.getPrototypeOf(value) === Object.prototype
+}
 
 function h<T extends keyof JSX.IntrinsicElements>(
   type: T,
   ...args: IsNullSafeObject<JSX.IntrinsicElements[T]> extends true
-    ? Fragment[] | [attrs: JSX.IntrinsicElements[T], ...children: Fragment[]]
-    : [attrs: JSX.IntrinsicElements[T], ...children: Fragment[]]
+    ? MaybeFragment[] | [attrs: JSX.IntrinsicElements[T], ...children: MaybeFragment[]]
+    : [attrs: JSX.IntrinsicElements[T], ...children: MaybeFragment[]]
 ): Element<T> {
-  if (args[0] instanceof Element || typeof args[0] !== 'object')
-    return new Element(type, {} as JSX.IntrinsicElements[T], args as Fragment[])
-  return new Element(type, args[0] ?? {} as JSX.IntrinsicElements[T], args.slice(1) as Fragment[])
+  let attrs = {} as JSX.IntrinsicElements[T]
+
+  if (args.length > 0 && !(args[0] instanceof Element) && isPlainObject(args[0])) {
+    attrs = args.shift() as JSX.IntrinsicElements[T]
+  }
+
+  return new Element(type, attrs, args.filter(Boolean) as Fragment[])
 }
 
 export default new Proxy(h, {
