@@ -57,7 +57,7 @@ const TRANSFORMERS: Record<NodeType, (node: Node) => Fragment> = {
   heading: node => h(`h${node.level}`, ...transformChildren(node)),
   code_block: node => h.codeblock({ lang: node.info ?? undefined }, esacpeSlot(node.literal!)),
   html_block: node => esacpeSlot(node.literal!),
-  thematic_break: () => h.br(),
+  thematic_break: () => h.hr(),
   custom_inline: node => { throw new Error(`Function ${node.type} not implemented.`) },
   custom_block: node => { throw new Error(`Function ${node.type} not implemented.`) },
 }
