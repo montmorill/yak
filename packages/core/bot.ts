@@ -40,7 +40,7 @@ export abstract class Bot<C extends Context = Context, T = any> {
   public adapter!: Adapter<C, this>
   public error: any
   public callbacks: Dict<(session: Session) => void> = {}
-  public logger!: Logger
+  public logger: Logger
 
   public _internalRouter: InternalRouter<C>
 

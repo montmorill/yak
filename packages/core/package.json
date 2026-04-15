@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "dependencies": {
-    "@cordisjs/plugin-http": "^1.2.0",
+    "@cordisjs/plugin-http": "^0.6.3",
     "@yak/protocol": "workspace:*",
     "cordis": "^3.18.1",
     "cosmokit": "^1.8.1",

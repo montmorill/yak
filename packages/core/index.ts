@@ -1,17 +1,17 @@
 import type { Meta, Response, SendOptions } from '@yak/protocol'
-import type { Disposable } from 'cordis'
+import type { Context, Disposable } from 'cordis'
 import type { Awaitable, Dict } from 'cosmokit'
 import type { Bot } from './bot'
 import type { ExtractParams, InternalRequest } from './internal'
 import type { Session } from './session'
 import { HTTP } from '@cordisjs/plugin-http'
 import h from '@yak/element'
-import { Context, Schema, Service } from 'cordis'
+import { Schema, Service } from 'cordis'
 import { defineProperty } from 'cosmokit'
 import { InternalRouter } from './internal'
 
 export * from './adapter'
-export { h as Element, h, HTTP, HTTP as Quester, h as segment }
+export { h, HTTP }
 export * from './bot'
 export * from './internal'
 export * from './message'
@@ -92,15 +92,15 @@ HTTP.createConfig = function createConfig(this, endpoint) {
 
 export type GetSession<C extends Context> = C[typeof Context.session]
 
-class SatoriContext extends Context {
-  constructor(config?: any) {
-    super(config)
-    this.set('satori', undefined)
-    this.plugin(Satori)
-  }
-}
+// class SatoriContext extends Context {
+//   constructor(config?: any) {
+//     super(config)
+//     this.set('satori', undefined)
+//     this.plugin(Satori)
+//   }
+// }
 
-export { SatoriContext as Context }
+// export { SatoriContext as Context }
 
 class DisposableSet<T> {
   private sn = 0

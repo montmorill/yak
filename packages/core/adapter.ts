@@ -38,7 +38,7 @@ export namespace Adapter {
   }).description('连接设置')
 
   export abstract class WsClientBase<C extends Context, B extends Bot<C>> extends Adapter<C, B> {
-    protected socket?: WebSocket
+    protected socket: WebSocket | null = null
     protected connectionId = 0
 
     protected abstract prepare(): Awaitable<WebSocket>
@@ -103,7 +103,7 @@ export namespace Adapter {
 
         socket.addEventListener('close', ({ code, reason }) => {
           if (this.socket === socket)
-            this.socket = undefined
+            this.socket = null
           logger.debug(`websocket closed with ${code}`)
           reconnect(initial, reason.toString() || `failed to connect to ${url}, code: ${code}`)
         })

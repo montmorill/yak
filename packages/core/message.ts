@@ -1,7 +1,8 @@
-import type { Element } from '@yak/element'
+import type { Fragment } from '@yak/element'
 import type { Channel, Message, SendOptions } from '@yak/protocol'
 import type { Context } from 'cordis'
 import type { Bot } from './bot'
+import { h } from '@yak/core'
 
 class AggregateError extends Error {
   constructor(public errors: Error[], message = '') {
@@ -19,13 +20,13 @@ export abstract class MessageEncoder<C extends Context = Context, B extends Bot<
   async prepare(): Promise<void> {}
 
   abstract flush(): Promise<void>
-  abstract visit(element: Element): Promise<void>
+  abstract visit(element: JSX.Element): Promise<void>
 
-  async render(content: Element, flush?: boolean): Promise<void> {
-    if (content)
-      await this.visit(content)
-    if (flush) {
-      await this.flush()
+  async render(...contents: Fragment[]): Promise<void> {
+    for (let content of contents) {
+      if (typeof content === 'string')
+        content = h.text({ content })
+      await this.visit(content as JSX.Element)
     }
   }
 
