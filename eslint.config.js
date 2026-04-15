@@ -4,6 +4,7 @@ import antfu from '@antfu/eslint-config'
 
 export default antfu({
   rules: {
+    'multiline-ternary': 'off',
     'style/operator-linebreak': ['error', 'before', {
       overrides: {
         '=': 'after',
