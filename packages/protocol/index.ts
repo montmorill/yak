@@ -103,71 +103,71 @@ export type Order = 'asc' | 'desc'
 
 export interface Methods {
   // message
-  createMessage: (channelId: string, element: Element, referrer?: any, options?: SendOptions) => Promise<Message[]>
-  sendMessage: (channelId: string, element: Element, referrer?: any, options?: SendOptions) => Promise<string[]>
-  sendPrivateMessage: (userId: string, element: Element, guildId?: string, options?: SendOptions) => Promise<string[]>
-  getMessage: (channelId: string, messageId: string) => Promise<Message>
-  getMessageList: (channelId: string, next?: string, direction?: Direction, limit?: number, order?: Order) => Promise<BidiList<Message>>
-  getMessageIter: (channelId: string) => AsyncIterable<Message>
-  editMessage: (channelId: string, messageId: string, element: Element) => Promise<void>
-  deleteMessage: (channelId: string, messageId: string) => Promise<void>
+  createMessage(channelId: string, element: Element, referrer?: any, options?: SendOptions): Promise<Message[]>
+  sendMessage(channelId: string, element: Element, referrer?: any, options?: SendOptions): Promise<string[]>
+  sendPrivateMessage(userId: string, element: Element, guildId?: string, options?: SendOptions): Promise<string[]>
+  getMessage(channelId: string, messageId: string): Promise<Message>
+  getMessageList(channelId: string, next?: string, direction?: Direction, limit?: number, order?: Order): Promise<BidiList<Message>>
+  getMessageIter(channelId: string): AsyncIterable<Message>
+  editMessage(channelId: string, messageId: string, element: Element): Promise<void>
+  deleteMessage(channelId: string, messageId: string): Promise<void>
 
   // reaction
-  createReaction: (channelId: string, messageId: string, emojiId: string) => Promise<void>
-  deleteReaction: (channelId: string, messageId: string, emojiId: string, userId?: string) => Promise<void>
-  clearReaction: (channelId: string, messageId: string, emojiId?: string) => Promise<void>
-  getReactionList: (channelId: string, messageId: string, emojiId: string, next?: string) => Promise<List<User>>
-  getReactionIter: (channelId: string, messageId: string, emojiId: string) => AsyncIterable<User>
+  createReaction(channelId: string, messageId: string, emojiId: string): Promise<void>
+  deleteReaction(channelId: string, messageId: string, emojiId: string, userId?: string): Promise<void>
+  clearReaction(channelId: string, messageId: string, emojiId?: string): Promise<void>
+  getReactionList(channelId: string, messageId: string, emojiId: string, next?: string): Promise<List<User>>
+  getReactionIter(channelId: string, messageId: string, emojiId: string): AsyncIterable<User>
 
   // upload
-  createUpload: (...uploads: Upload[]) => Promise<string[]>
+  createUpload(...uploads: Upload[]): Promise<string[]>
 
   // user
-  getLogin: () => Promise<Login>
-  getUser: (userId: string, guildId?: string) => Promise<User>
-  getFriendList: (next?: string) => Promise<List<Friend>>
-  getFriendIter: () => AsyncIterable<Friend>
-  deleteFriend: (userId: string) => Promise<void>
+  getLogin(): Promise<Login>
+  getUser(userId: string, guildId?: string): Promise<User>
+  getFriendList(next?: string): Promise<List<Friend>>
+  getFriendIter(): AsyncIterable<Friend>
+  deleteFriend(userId: string): Promise<void>
 
   // guild
-  getGuild: (guildId: string) => Promise<Guild>
-  getGuildList: (next?: string) => Promise<List<Guild>>
-  getGuildIter: () => AsyncIterable<Guild>
+  getGuild(guildId: string): Promise<Guild>
+  getGuildList(next?: string): Promise<List<Guild>>
+  getGuildIter(): AsyncIterable<Guild>
 
   // guild member
-  getGuildMember: (guildId: string, userId: string) => Promise<GuildMember>
-  getGuildMemberList: (guildId: string, next?: string) => Promise<List<GuildMember>>
-  getGuildMemberIter: (guildId: string) => AsyncIterable<GuildMember>
-  kickGuildMember: (guildId: string, userId: string, permanent?: boolean) => Promise<void>
-  muteGuildMember: (guildId: string, userId: string, duration: number, reason?: string) => Promise<void>
-  setGuildMemberRole: (guildId: string, userId: string, roleId: string) => Promise<void>
-  unsetGuildMemberRole: (guildId: string, userId: string, roleId: string) => Promise<void>
-  getGuildMemberRoleList: (guildId: string, userId: string, next?: string) => Promise<List<PartialWithPick<GuildRole, 'id'>>>
+  getGuildMember(guildId: string, userId: string): Promise<GuildMember>
+  getGuildMemberList(guildId: string, next?: string): Promise<List<GuildMember>>
+  getGuildMemberIter(guildId: string): AsyncIterable<GuildMember>
+  kickGuildMember(guildId: string, userId: string, permanent?: boolean): Promise<void>
+  muteGuildMember(guildId: string, userId: string, duration: number, reason?: string): Promise<void>
+  setGuildMemberRole(guildId: string, userId: string, roleId: string): Promise<void>
+  unsetGuildMemberRole(guildId: string, userId: string, roleId: string): Promise<void>
+  getGuildMemberRoleList(guildId: string, userId: string, next?: string): Promise<List<PartialWithPick<GuildRole, 'id'>>>
 
   // role
-  getGuildRoleList: (guildId: string, next?: string) => Promise<List<GuildRole>>
-  getGuildRoleIter: (guildId: string) => AsyncIterable<GuildRole>
-  createGuildRole: (guildId: string, data: Partial<GuildRole>) => Promise<GuildRole>
-  updateGuildRole: (guildId: string, roleId: string, data: Partial<GuildRole>) => Promise<void>
-  deleteGuildRole: (guildId: string, roleId: string) => Promise<void>
+  getGuildRoleList(guildId: string, next?: string): Promise<List<GuildRole>>
+  getGuildRoleIter(guildId: string): AsyncIterable<GuildRole>
+  createGuildRole(guildId: string, data: Partial<GuildRole>): Promise<GuildRole>
+  updateGuildRole(guildId: string, roleId: string, data: Partial<GuildRole>): Promise<void>
+  deleteGuildRole(guildId: string, roleId: string): Promise<void>
 
   // channel
-  getChannel: (channelId: string, guildId?: string) => Promise<Channel>
-  getChannelList: (guildId: string, next?: string) => Promise<List<Channel>>
-  getChannelIter: (guildId: string) => AsyncIterable<Channel>
-  createDirectChannel: (userId: string, guildId?: string) => Promise<Channel>
-  createChannel: (guildId: string, data: Partial<Channel>) => Promise<Channel>
-  updateChannel: (channelId: string, data: Partial<Channel>) => Promise<void>
-  deleteChannel: (channelId: string) => Promise<void>
-  muteChannel: (channelId: string, guildId?: string, enable?: boolean) => Promise<void>
+  getChannel(channelId: string, guildId?: string): Promise<Channel>
+  getChannelList(guildId: string, next?: string): Promise<List<Channel>>
+  getChannelIter(guildId: string): AsyncIterable<Channel>
+  createDirectChannel(userId: string, guildId?: string): Promise<Channel>
+  createChannel(guildId: string, data: Partial<Channel>): Promise<Channel>
+  updateChannel(channelId: string, data: Partial<Channel>): Promise<void>
+  deleteChannel(channelId: string): Promise<void>
+  muteChannel(channelId: string, guildId?: string, enable?: boolean): Promise<void>
 
   // request
-  handleFriendRequest: (messageId: string, approve: boolean, comment?: string) => Promise<void>
-  handleGuildRequest: (messageId: string, approve: boolean, comment?: string) => Promise<void>
-  handleGuildMemberRequest: (messageId: string, approve: boolean, comment?: string) => Promise<void>
+  handleFriendRequest(messageId: string, approve: boolean, comment?: string): Promise<void>
+  handleGuildRequest(messageId: string, approve: boolean, comment?: string): Promise<void>
+  handleGuildMemberRequest(messageId: string, approve: boolean, comment?: string): Promise<void>
 
   // commands
-  updateCommands: (commands: Command[]) => Promise<void>
+  updateCommands(commands: Command[]): Promise<void>
 }
 
 export interface Channel {
@@ -281,7 +281,7 @@ export namespace Resource {
   // }
 }
 
-// export function transformKey(source: any, callback: (key: string) => string) {
+// export function transformKey(source: any, callback(key: string): string) {
 //   if (!source || typeof source !== 'object')
 //     return source
 //   if (Array.isArray(source))
