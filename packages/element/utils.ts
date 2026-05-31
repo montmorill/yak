@@ -1,5 +1,5 @@
-import type { Element, Fragment } from './jsx-runtime'
-import h from './jsx-runtime'
+import type { Fragment } from './jsx-runtime'
+import h, { Element } from './jsx-runtime'
 
 export function pack(...children: Fragment[]): Fragment {
   return children.length === 1 ? children[0]! : h.template(...children)
@@ -7,4 +7,18 @@ export function pack(...children: Fragment[]): Fragment {
 
 export function raw(strings: TemplateStringsArray, ...values: Fragment[]): Element {
   return h.template(...strings.flatMap((s, i) => values[i] ? [s, values[i]] : [s]))
+}
+
+type Transformer = (node: Fragment) => Fragment
+
+export function transform(
+  fragment: Fragment,
+  visitors: Partial<Record<keyof JSX.IntrinsicElements, Transformer>>,
+): Fragment {
+  if (fragment instanceof Element) {
+    visitors[fragment.type]?.(fragment)
+    fragment.children = fragment.children
+      .map(child => transform(child, visitors))
+  }
+  return fragment
 }
