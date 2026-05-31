@@ -9,7 +9,7 @@ export function raw(strings: TemplateStringsArray, ...values: Fragment[]): Eleme
   return h.template(...strings.flatMap((s, i) => values[i] ? [s, values[i]] : [s]))
 }
 
-type Transformer = (node: Fragment) => Fragment
+type Transformer = (element: Element) => Fragment
 
 export function transform(
   fragment: Fragment,
