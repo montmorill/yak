@@ -71,6 +71,9 @@ function h<T extends keyof JSX.IntrinsicElements>(type: T, ...args: ElementInit<
   return new Element(type, attrs, args.filter(Boolean))
 }
 
+h.Element = Element
+h.Fragment = Fragment
+
 export default new Proxy(h, {
   get(target, prop, receiver) {
     if (Object.hasOwn(target, prop))

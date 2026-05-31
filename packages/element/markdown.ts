@@ -2,6 +2,7 @@ import type { Node, NodeType } from 'commonmark'
 import type { Fragment } from './jsx-runtime'
 import { Parser } from 'commonmark'
 import h, { Element } from './jsx-runtime'
+import { pack } from './utils'
 
 const parser = new Parser()
 
@@ -15,18 +16,14 @@ export function markdown(strings: TemplateStringsArray, ...values: Fragment[]): 
   return transformNode(ast)
 }
 
-export function pack(...children: Fragment[]): Fragment {
-  return children.length === 1 ? children[0]! : h.template(...children)
-}
-
-interface MarkdownElement {
+export interface MarkdownElement {
   br: object
   emph: object
   strong: object
   link: { href: string, title?: string }
   image: { src: string, title?: string }
   code: object
-  p: object
+  paragraph: object
   blockquote: object
   list: { ordered?: boolean, start?: number, delimiter?: ')' | '.' }
   heading: { level: number }
@@ -61,7 +58,7 @@ const TRANSFORMERS: Record<NodeType, (node: Node) => Fragment> = {
   }, ...transformChildren(node)),
   code: node => h.code(esacpeSlot(node.literal!)),
   document: node => h.template(...transformChildren(node)),
-  paragraph: node => h.p(...transformChildren(node)),
+  paragraph: node => h.paragraph(...transformChildren(node)),
   block_quote: node => h.blockquote(...transformChildren(node)),
   item: node => pack(...transformChildren(node)),
   list: node => h.list({

@@ -1,8 +1,10 @@
 import type { Awaitable } from 'cosmokit'
-import h, { Element, Fragment } from './jsx-runtime'
+import h from './jsx-runtime'
 import { markdown } from './markdown'
+import * as utils from './utils'
 
-export type { Elements } from './jsx-runtime'
+export * from './jsx-runtime'
+export * from './utils'
 
 declare module './jsx-runtime' {
   interface Elements {
@@ -13,9 +15,4 @@ declare module './jsx-runtime' {
   }
 }
 
-function raw(strings: TemplateStringsArray, ...values: Fragment[]): Element {
-  return h.template(...strings.flatMap((s, i) => values[i] ? [s, values[i]] : [s]))
-}
-
-export { Element, Fragment, markdown, raw }
-export default Object.assign(h, { Element, Fragment, markdown, raw })
+export default Object.assign(h, { markdown, ...utils })
