@@ -15,19 +15,22 @@ export function markdown(strings: TemplateStringsArray, ...values: Fragment[]): 
   return transformNode(ast)
 }
 
-interface MarkdownElement extends Record<`h${number}`, object> {
+export function pack(...children: Fragment[]): Fragment {
+  return children.length === 1 ? children[0]! : h.template(...children)
+}
+
+interface MarkdownElement {
   br: object
-  em: object
+  emph: object
   strong: object
-  a: { href: string, title?: string }
-  img: { src: string, title?: string }
+  link: { href: string, title?: string }
+  image: { src: string, title?: string }
   code: object
   p: object
   blockquote: object
-  li: object
-  ol: { start?: number, delimiter?: ')' | '.' }
-  ul: object
-  codeblock: { lang?: string }
+  list: { ordered?: boolean, start?: number, delimiter?: ')' | '.' }
+  heading: { level: number }
+  codeblock: { info?: string }
   hr: object
 }
 
@@ -37,29 +40,45 @@ declare global {
   }
 }
 
+function unimplemented(node: Node): Fragment {
+  throw new Error(`Function ${node.type} not implemented.`)
+}
+
 const TRANSFORMERS: Record<NodeType, (node: Node) => Fragment> = {
   text: node => esacpeSlot(node.literal!),
   softbreak: () => ' ',
   linebreak: () => h.br(),
-  emph: node => h.em(...transformChildren(node)),
+  emph: node => h.emph(...transformChildren(node)),
   strong: node => h.strong(...transformChildren(node)),
   html_inline: node => esacpeSlot(node.literal!),
-  link: node => h.a({ href: node.destination!, title: node.title ?? undefined }, ...transformChildren(node)),
-  image: node => h.img({ src: node.destination!, title: node.title ?? undefined }, ...transformChildren(node)),
+  link: node => h.link({
+    href: node.destination!,
+    title: node.title ?? undefined,
+  }, ...transformChildren(node)),
+  image: node => h.image({
+    src: node.destination!,
+    title: node.title ?? undefined,
+  }, ...transformChildren(node)),
   code: node => h.code(esacpeSlot(node.literal!)),
   document: node => h.template(...transformChildren(node)),
   paragraph: node => h.p(...transformChildren(node)),
   block_quote: node => h.blockquote(...transformChildren(node)),
-  item: node => h.li(...transformChildren(node)),
-  list: node => node.listType === 'ordered'
-    ? h.ol({ start: node.listStart, delimiter: node.listDelimiter }, ...transformChildren(node))
-    : h.ul(...transformChildren(node)),
-  heading: node => h(`h${node.level}`, ...transformChildren(node)),
-  code_block: node => h.codeblock({ lang: node.info ?? undefined }, esacpeSlot(node.literal!)),
+  item: node => pack(...transformChildren(node)),
+  list: node => h.list({
+    ordered: node.listType === 'ordered',
+    start: node.listStart,
+    delimiter: node.listDelimiter,
+  }, ...transformChildren(node)),
+  heading: node => h.heading({
+    level: node.level,
+  }, ...transformChildren(node)),
+  code_block: node => h.codeblock({
+    info: node.info ?? undefined,
+  }, esacpeSlot(node.literal!)),
   html_block: node => esacpeSlot(node.literal!),
   thematic_break: () => h.hr(),
-  custom_inline: (node) => { throw new Error(`Function ${node.type} not implemented.`) },
-  custom_block: (node) => { throw new Error(`Function ${node.type} not implemented.`) },
+  custom_inline: unimplemented,
+  custom_block: unimplemented,
 }
 
 function transformNode(node: Node): Fragment {
@@ -106,14 +125,10 @@ function esacpeSlot(...children: [Fragment]): Fragment {
     const value = slotValues[+match[1]!]!
     const after = lastStr.slice(match.index! + match[0].length)
 
-    if (before) {
-      children.push(before)
-    }
+    before && children.push(before)
     children.push(value)
-    if (after) {
-      children.push(after)
-    }
+    after && children.push(after)
   }
 
-  return children.length === 1 ? children[0] : h.template(...children)
+  return pack(...children)
 }

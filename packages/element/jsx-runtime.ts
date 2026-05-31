@@ -48,7 +48,7 @@ declare global {
 export class Element<T extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements> {
   constructor(
     readonly type: T,
-    readonly attrs = {} as ElementProps<T>,
+    readonly attrs: ElementProps<T>,
     readonly children: Fragment[] = [],
   ) {}
 
